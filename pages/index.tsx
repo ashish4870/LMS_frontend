@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'; // Assuming you have an AuthCo
 
 const HomePage = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const handleRegisterAndStartTest = async () => {
     if (!user) {
@@ -19,7 +19,7 @@ const HomePage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user._id }),
+        body: JSON.stringify({ userId: user._id, token }),
       });
 
       if (!response.ok) {

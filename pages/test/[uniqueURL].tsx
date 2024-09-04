@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import PrivateRoute from '@/components/PrivateRoute';
 import { Line } from 'react-chartjs-2';
+import { useAuth } from '@/context/AuthContext';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,6 +27,7 @@ ChartJS.register(
 );
 
 const TestPage = () => {
+  const { token } = useAuth();
   const [question, setQuestion] = useState<string>('');
   const [UIanswer, setUIanswer] = useState('');
   const [answer, setAnswer] = useState<string>('');
@@ -49,7 +51,9 @@ const TestPage = () => {
 
   const fetchRandomQuestion = async () => {
     try {
-      const response = await axios.get(`/api/question/getQuestion`);
+      const response = await axios.post(`/api/question/getQuestion`, {
+        token,  
+      });
       setQuestion(response.data.text);
       setQuestionId(response.data._id);
       setDifficulty(response.data.difficulty); 
@@ -70,13 +74,14 @@ const TestPage = () => {
 
     try {
       let score = 0;
-      if (answer == UIanswer) {
+      if (answer === UIanswer) {
         score = 1;
       } else {
         score = 0;
       }
 
       const response = await axios.post(`/api/tests/updateTest`, {
+        token,  
         questionId,
         answer: UIanswer,
         difficulty,
@@ -88,6 +93,7 @@ const TestPage = () => {
       if (response.data.message === 'Test completed') {
         setIsTestCompleted(true);
         const testRes = await axios.post(`/api/tests/getTest`, {
+          token,  
           testId,
         });
         const scores = testRes.data.questions.map((q: any) => q.score);
@@ -99,9 +105,9 @@ const TestPage = () => {
         const nextQuestionDifficulty = response.data.nextQuestion.difficulty;
 
         if (nextQuestionDifficulty === 1 || nextQuestionDifficulty === 9) {
-
           setIsTestCompleted(true);
           const testRes = await axios.post(`/api/tests/getTest`, {
+            token,  
             testId,
           });
   

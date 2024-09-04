@@ -7,11 +7,20 @@ export default async function registerTest(req: NextApiRequest, res: NextApiResp
   }
 
   try {
-    const { userId } = req.body;
-    const response = await axios.post('http://localhost:5000/api/tests', { userId });
+    const { userId, token } = req.body;
+    const response = await axios.post(
+      'http://localhost:5000/api/tests',
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      }
+    );
+    console.log(response, 'this');
     res.status(201).json(response.data);
   } catch (error) {
-    // console.error('Error registering for the test:', error);
+    console.error('Error registering for the test:', error);
     res.status(500).json({ message: 'Error registering for the test' });
   }
 }
